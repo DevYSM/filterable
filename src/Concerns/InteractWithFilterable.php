@@ -14,10 +14,11 @@ trait InteractWithFilterable
     /**
      * Apply all relevant filters.
      *
-     * @param Builder    $query
+     * @param Builder           $query
      * @param Filterable|string $filter
      *
      * @return \Illuminate\Database\Eloquent\Builder
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function scopeFilterable(Builder $query, Filterable|string $filter): \Illuminate\Database\Eloquent\Builder
     {
