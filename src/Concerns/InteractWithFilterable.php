@@ -3,6 +3,7 @@
 namespace YSM\Filterable\Concerns;
 
 use Illuminate\Database\Eloquent\Builder;
+use InvalidArgumentException;
 use YSM\Filterable\Filterable;
 
 /**
@@ -14,12 +15,19 @@ trait InteractWithFilterable
      * Apply all relevant filters.
      *
      * @param Builder    $query
-     * @param Filterable $filter
+     * @param Filterable|string $filter
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeFilterable(Builder $query, Filterable $filter): \Illuminate\Database\Eloquent\Builder
+    public function scopeFilterable(Builder $query, Filterable|string $filter): \Illuminate\Database\Eloquent\Builder
     {
+        if (is_string($filter)) {
+            $filter = app()->make($filter);
+            if (!$filter instanceof Filterable) {
+                throw new InvalidArgumentException("The provided filter class must implement the Filterable interface.");
+            }
+        }
+
         return $filter->apply($query);
     }
 }

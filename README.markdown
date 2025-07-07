@@ -10,13 +10,13 @@ and models, promoting clean code and adherence to the Single Responsibility Prin
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Usage](#usage)
-    - [Basic Usage](#basic-usage)
-    - [Advanced Use Cases](#advanced-use-cases)
-        - [Using Aliases](#using-aliases)
-        - [Auto-Applying Filters](#auto-applying-filters)
-        - [Whitelisting and Blacklisting Filters](#whitelisting-and-blacklisting-filters)
-        - [Setting Default Filter Values](#setting-default-filter-values)
-        - [Debugging Applied Filters](#debugging-applied-filters)
+  - [Basic Usage](#basic-usage)
+  - [Advanced Use Cases](#advanced-use-cases)
+    - [Using Aliases](#using-aliases)
+    - [Auto-Applying Filters](#auto-applying-filters)
+    - [Whitelisting and Blacklisting Filters](#whitelisting-and-blacklisting-filters)
+    - [Setting Default Filter Values](#setting-default-filter-values)
+    - [Debugging Applied Filters](#debugging-applied-filters)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -39,8 +39,8 @@ and models, promoting clean code and adherence to the Single Responsibility Prin
    *Note*: If no service provider exists, you can skip this step as the package is ready to use after installation.
 
 3. **Requirements**:
-    - PHP 8.0 or higher
-    - Laravel 8.x or higher
+   - PHP 8.0 or higher
+   - Laravel 8.x or higher
 
 ## Configuration
 
@@ -77,7 +77,7 @@ class Post extends Model
 }
 ```
 
-This adds a `filterable` scope to the `Post` model, allowing you to apply filters using a `Filterable` instance.
+This adds a `filterable` scope to the `Post` model, allowing you to apply filters using either a `Filterable` instance or a filter class name as a string.
 
 #### Step 2: Create a Filter Class
 
@@ -114,7 +114,9 @@ class PostFilter extends Filterable
 
 #### Step 3: Use in a Controller
 
-Apply the filter in a controller:
+Apply the filter in a controller. You can use the filter in two ways:
+
+**Method 1: Using Filter Instance**
 
 ```php
 <?php
@@ -135,6 +137,34 @@ class PostController extends Controller
 }
 ```
 
+**Method 2: Using Filter Class Name (String)**
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Filters\PostFilter;
+use App\Models\Post;
+
+class PostController extends Controller
+{
+    public function index()
+    {
+        // Pass the filter class name as a string
+        $posts = Post::filterable(PostFilter::class)->get();
+        return response()->json(['data' => $posts]);
+    }
+}
+```
+
+> **Note**: When using a string class name, the filterable method will automatically resolve the filter from Laravel's service container and validate that it implements the `Filterable` interface.
+
+**When to Use Each Method:**
+
+- **Filter Instance**: Use when you need to add additional configuration to the filter instance (aliases, defaults, etc.) or override existing behavior before applying it.
+- **String Class Name**: Use for simple and direct applying the filter without needing to add additional configuration.
+
 **Example Request**:
 
 ```bash
@@ -146,15 +176,15 @@ curl -X GET "http://your-app.test/posts?title=Test&category=news&published=1" \
 
 ```json
 {
-    "data": [
-        {
-            "id": 1,
-            "title": "Test Post",
-            "category": "news",
-            "published": true,
-            "created_at": "2025-01-01T00:00:00.000000Z"
-        }
-    ]
+  "data": [
+    {
+      "id": 1,
+      "title": "Test Post",
+      "category": "news",
+      "published": true,
+      "created_at": "2025-01-01T00:00:00.000000Z"
+    }
+  ]
 }
 ```
 
@@ -366,29 +396,26 @@ class PostController extends Controller
 
 ```json
 {
-    "data": [
-        {
-            "id": 1,
-            "title": "Test Post",
-            "category": "news",
-            "published": true,
-            "created_at": "2025-01-01T00:00:00.000000Z"
-        }
-    ],
-    "applied_filters": {
-        "title": "Test",
-        "category": "news"
-    },
-    "configured_filters": {
-        "autoApply": [],
-        "aliases": [],
-        "allowed": [
-            "title",
-            "category"
-        ],
-        "forbidden": [],
-        "defaults": []
+  "data": [
+    {
+      "id": 1,
+      "title": "Test Post",
+      "category": "news",
+      "published": true,
+      "created_at": "2025-01-01T00:00:00.000000Z"
     }
+  ],
+  "applied_filters": {
+    "title": "Test",
+    "category": "news"
+  },
+  "configured_filters": {
+    "autoApply": [],
+    "aliases": [],
+    "allowed": ["title", "category"],
+    "forbidden": [],
+    "defaults": []
+  }
 }
 ```
 
