@@ -25,7 +25,7 @@ trait InteractWithFilterable
         if (is_string($filter)) {
             $filter = app()->make($filter);
             if (!$filter instanceof Filterable) {
-                throw new InvalidArgumentException("The provided filter class must implement the Filterable interface.");
+                throw new InvalidArgumentException("The provided filter class must implement the Filterable abstraction class.");
             }
         }
 
