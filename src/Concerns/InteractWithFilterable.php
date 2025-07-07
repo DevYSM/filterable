@@ -7,7 +7,7 @@ use InvalidArgumentException;
 use YSM\Filterable\Filterable;
 
 /**
- * @method static Builder filterable(Filterable $filter)
+ * @method static Builder filterable(Filterable|string $filter)
  */
 trait InteractWithFilterable
 {
