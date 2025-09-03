@@ -80,9 +80,9 @@ abstract class Filterable
      */
     protected function applyAutoFilters(): void
     {
-        foreach ($this->autoApplyFilters as $filter) {
+        foreach ($this->autoApplyFilters as $filter => $value) {
             if (method_exists($this, $filter)) {
-                $this->applyFilter($filter);
+                $this->applyFilter($filter, $value);
             }
         }
     }
