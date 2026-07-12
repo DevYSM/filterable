@@ -106,12 +106,27 @@ abstract class Filterable
         $value = $value ?? $this->getFilterValue($filter);
         $this->appliedFilters[$filter] = $value;
 
-        if ($value === null) {
+        if ($value === null && $this->filterAcceptsNoArguments($filter)) {
             call_user_func([$this, $filter]);
             return;
         }
 
         call_user_func([$this, $filter], $value);
+    }
+
+    /**
+     * Determine whether a filter method's first parameter has its own
+     * default value, so it can be safely invoked without an argument.
+     *
+     * @param string $filter The filter method name
+     *
+     * @return bool
+     */
+    protected function filterAcceptsNoArguments(string $filter): bool
+    {
+        $parameters = (new \ReflectionMethod($this, $filter))->getParameters();
+
+        return isset($parameters[0]) && $parameters[0]->isDefaultValueAvailable();
     }
 
     /**
