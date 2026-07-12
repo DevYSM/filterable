@@ -80,7 +80,9 @@ abstract class Filterable
      */
     protected function applyAutoFilters(): void
     {
-        foreach ($this->autoApplyFilters as $filter => $value) {
+        foreach ($this->autoApplyFilters as $key => $value) {
+            [$filter, $value] = is_int($key) ? [$value, null] : [$key, $value];
+
             if (method_exists($this, $filter)) {
                 $this->applyFilter($filter, $value);
             }
@@ -103,6 +105,11 @@ abstract class Filterable
 
         $value = $value ?? $this->getFilterValue($filter);
         $this->appliedFilters[$filter] = $value;
+
+        if ($value === null) {
+            call_user_func([$this, $filter]);
+            return;
+        }
 
         call_user_func([$this, $filter], $value);
     }
